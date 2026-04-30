@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Teste de Upload - Certificado</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 500px; margin: auto; }
+        div { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        input { width: 100%; padding: 8px; box-sizing: border-box; }
+        button { padding: 12px 20px; background: #28a745; color: white; border: none; cursor: pointer; font-size: 16px; width: 100%;}
+        button:hover { background: #218838; }
+        pre { background: #333; color: #0f0; padding: 15px; border-radius: 5px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h2>🚀 Enviar Certificado</h2>
+    <form id="formCertificado">
+        <div>
+            <label>1. Seu Token JWT:</label>
+            <input type="text" id="token" placeholder="eyJhbGciOiJIUzI1NiIs..." required>
+        </div>
+        <div>
+            <label>2. Título da Atividade:</label>
+            <input type="text" id="tituloAtividade" value="Minicurso de IA" required>
+        </div>
+        <div>
+            <label>3. Carga Horária:</label>
+            <input type="number" id="cargaHorariaInformada" value="10" required>
+        </div>
+        <div>
+            <label>4. Data da Atividade:</label>
+            <input type="date" id="dataAtividade" value="2024-05-10" required>
+        </div>
+        <div>
+            <label>5. ID da Área:</label>
+            <input type="number" id="areaId" value="1" required>
+        </div>
+        <div>
+            <label>6. Imagem do Certificado:</label>
+            <input type="file" id="arquivo" required>
+        </div>
+        <button type="submit">Enviar para o Servidor</button>
+    </form>
+
+    <h3>Resposta do Servidor:</h3>
+    <pre id="resposta">Aguardando envio...</pre>
+
+    <script>
+        document.getElementById('formCertificado').addEventListener('submit', async (e) => {
+            e.preventDefault(); // Evita recarregar a página
+            
+            const token = document.getElementById('token').value.trim(); // Pega o token
+            
+            // O FormData faz exatamente a mesma coisa que o Thunder Client deveria fazer!
+            const formData = new FormData();
+            formData.append('tituloAtividade', document.getElementById('tituloAtividade').value);
+            formData.append('cargaHorariaInformada', document.getElementById('cargaHorariaInformada').value);
+            formData.append('dataAtividade', document.getElementById('dataAtividade').value);
+            formData.append('areaId', document.getElementById('areaId').value);
+            formData.append('arquivo', document.getElementById('arquivo').files[0]); // Pega o arquivo físico
+
+            document.getElementById('resposta').innerText = "Enviando... ⏳";
+
+            try {
+                const response = await fetch('http://localhost:3000/api/certificados/enviar', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}` 
+                        // Note que NÃO colocamos Content-Type aqui. O navegador faz isso sozinho e sem bugar!
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+                document.getElementById('resposta').innerText = `Status: ${response.status}\n\n${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                document.getElementById('resposta').innerText = 'Erro de Conexão: ' + error.message;
+            }
+        });
+    </script>
+</body>
+</html>

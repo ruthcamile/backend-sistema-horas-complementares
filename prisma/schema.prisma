@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ALUNO
+  COORDENADOR
+}
+
+enum StatusValidacao {
+  PENDENTE
+  APROVADO
+  RECUSADO
+}
+
+model User {
+  id           Int     @id @default(autoincrement())
+  nome         String
+  email        String  @unique
+  senha        String
+  role         Role    @default(ALUNO)
+  matricula    String? @unique
+  departamento String?
+  
+  // Relacionamento: Um aluno pode ter vários certificados
+  certificados Certificado[]
+}
+
+model AreaAtividade {
+  id              Int    @id @default(autoincrement())
+  nome            String
+  limiteHorasArea Float
+
+  certificados    Certificado[]
+}
+
+model Certificado {
+  id                    Int      @id @default(autoincrement())
+  tituloAtividade       String
+  cargaHorariaInformada Float
+  dataAtividade         DateTime
+  arquivoImagem         String
+  dataEnvio             DateTime @default(now())
+
+  // Relacionamento com o Aluno
+  alunoId Int
+  aluno   User @relation(fields: [alunoId], references: [id])
+
+  // Relacionamento com a Área de Atividade
+  areaId  Int
+  area    AreaAtividade @relation(fields: [areaId], references: [id])
+
+  // Relacionamento 1:1 com a Validação
+  validacao Validacao?
+}
+
+model Validacao {
+  id             Int             @id @default(autoincrement())
+  status         StatusValidacao @default(PENDENTE)
+  observacao     String?         @db.Text
+  horasValidadas Float?
+  dataValidacao  DateTime?
+
+  certificadoId  Int             @unique
+  certificado    Certificado     @relation(fields: [certificadoId], references: [id])
+}
