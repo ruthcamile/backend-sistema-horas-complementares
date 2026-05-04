@@ -2,7 +2,7 @@
 import express from 'express';
 import cors from 'cors';
 import * as dotenv from 'dotenv';
-import { authRoutes } from './routes/auth.routes'; // <-- IMPORTAÇÃO NOVA
+import { authRoutes } from './routes/auth.routes'; 
 import { certificadoRoutes } from './routes/certificado.routes';
 
 dotenv.config(); 

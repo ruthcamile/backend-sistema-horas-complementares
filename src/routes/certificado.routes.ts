@@ -2,6 +2,7 @@
 import { Router } from 'express';
 import { CertificadoController } from '../controllers/CertificadoController';
 import { authMiddleware } from '../middlewares/authMiddleware';
+import { checkRole } from '../middlewares/roleMiddleware';
 import { upload } from '../config/multer';
 
 const certificadoRoutes = Router();
@@ -18,13 +19,20 @@ certificadoRoutes.post(
 // 2. Rota de Listagem do Aluno (GET)
 certificadoRoutes.get('/meus', authMiddleware, certificadoController.listarMeus);
 
-// 3. NOVA Rota de Listagem do Coordenador (GET)
-// Tem que ficar AQUI, antes do export!
-certificadoRoutes.get('/pendentes', authMiddleware, certificadoController.listarPendentes);
+// Rota de Listagem do Coordenador (GET) - protegidas por autenticação e role
+certificadoRoutes.get(
+  '/pendentes', 
+  authMiddleware, 
+  checkRole(['COORDENADOR']), // <--- TRAVA DE ROLE AQUI
+  certificadoController.listarPendentes
+);
 
-// NOVA ROTA: Validação pelo Coordenador (PATCH)
-// O :id é um route param dinâmico interceptado pelo Express
-certificadoRoutes.patch('/:id/validar', authMiddleware, certificadoController.validar);
+// Rota de Validação pelo Coordenador (PATCH) - protegida por autenticação e role
+certificadoRoutes.patch(
+  '/:id/validar', 
+  authMiddleware, 
+  checkRole(['COORDENADOR']), // <--- TRAVA DE ROLE AQUI
+  certificadoController.validar
+);
 
-// O export PRECISA ser a última linha do arquivo!
 export { certificadoRoutes };
