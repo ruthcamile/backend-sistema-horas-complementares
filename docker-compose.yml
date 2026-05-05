@@ -1,0 +1,59 @@
+# primeiro o docker vai subir o banco de dados primeiro, version: '3.8'
+
+services:
+  # ==========================================
+  # API NODE.JS
+  # ==========================================
+  api:
+    build: .
+    container_name: api-certificados
+    ports:
+      - "3000:3000"
+    environment:
+      # em vez de localhost, aponta para o nome do serviço 'db' e 'minio'
+      - DATABASE_URL=mysql://root:senha123@db:3306/sistema_acc
+      - JWT_SECRET=sua_chave_secreta_do_jwt
+      - AWS_S3_ENDPOINT=http://minio:9000
+      - AWS_S3_ACCESS_KEY=minioadmin
+      - AWS_S3_SECRET_KEY=minioadmin
+      - AWS_S3_BUCKET_NAME=certificados
+    depends_on:
+      - db
+      - minio
+
+  # ==========================================
+  # 2. BANCO DE DADOS MYSQL
+  # ==========================================
+  db:
+    image: mysql:8.0
+    container_name: mysql-certificados
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=senha123
+      - MYSQL_DATABASE=sistema_acc
+    volumes:
+      # Isso garante que se o PC reiniciar, os alunos não somem
+      - mysql_data:/var/lib/mysql
+
+  # ==========================================
+  # 3. COFRE MINIO (S3 LOCAL)
+  # ==========================================
+  minio:
+    image: minio/minio:latest
+    container_name: minio-certificados
+    ports:
+      - "9000:9000" # Porta da API
+      - "9001:9001" # Porta do Painel Visual
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    command: server /data --console-address ":9001"
+    volumes:
+      # isso garante que as fotos dos certificados não sumam
+      - minio_data:/data
+
+# Declaração dos volumes (os "HDs" virtuais onde os dados ficam salvos)
+volumes:
+  mysql_data:
+  minio_data:depois o MinIO, e só depois ligar a API conectando ela nos dois
