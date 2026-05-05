@@ -35,4 +35,12 @@ certificadoRoutes.patch(
   certificadoController.validar
 );
 
+// 3. Rota de Validação do Coordenador (PATCH)
+certificadoRoutes.patch(
+  '/:id/validar',
+  authMiddleware,
+  checkRole(['COORDENADOR']),
+  certificadoController.validar
+);
+
 export { certificadoRoutes };

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - Meus Certificados</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 700px; margin: auto; }
+        input, button { width: 100%; padding: 10px; margin-bottom: 15px; box-sizing: border-box; }
+        button { background: #007bff; color: white; border: none; cursor: pointer; font-size: 16px; font-weight: bold; }
+        button:hover { background: #0056b3; }
+        pre { background: #222; color: #0f0; padding: 15px; border-radius: 5px; overflow-x: auto; font-size: 14px;}
+        .certificado-card { border: 1px solid #ccc; padding: 15px; margin-top: 15px; border-radius: 8px; background: #f9f9f9;}
+        .certificado-card img { max-width: 100%; height: auto; margin-top: 10px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .status { font-weight: bold; padding: 3px 8px; border-radius: 4px; color: white; }
+        .status.PENDENTE { background: #f0ad4e; }
+        .status.APROVADO { background: #5cb85c; }
+        .status.RECUSADO { background: #d9534f; }
+    </style>
+</head>
+<body>
+    <h2>📋 Dashboard do Aluno</h2>
+    
+    <label>Cole seu Token JWT aqui:</label>
+    <input type="text" id="token" placeholder="eyJhbGciOiJIUzI1NiIs..." required>
+    
+    <button onclick="listarCertificados()">Buscar Meus Certificados</button>
+
+    <h3>Visão do Frontend:</h3>
+    <div id="galeria">Aqui vão aparecer os seus certificados...</div>
+
+    <h3>Dados Brutos (JSON do Servidor):</h3>
+    <pre id="resposta">Aguardando...</pre>
+
+    <script>
+        async function listarCertificados() {
+            const token = document.getElementById('token').value.trim();
+            const divResposta = document.getElementById('resposta');
+            const divGaleria = document.getElementById('galeria');
+            
+            divResposta.innerText = "Buscando na API... ⏳";
+            divGaleria.innerHTML = "";
+
+            try {
+                // Chama a sua rota GET
+                const response = await fetch('http://localhost:3000/api/certificados/meus', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                // Imprime o JSON na tela preta
+                divResposta.innerText = JSON.stringify(data, null, 2);
+
+                // Monta a interface visual se a requisição deu sucesso
+                if (response.ok) {
+                    // Exibe o Resumo (Matemática que fizemos no Repository)
+                    divGaleria.innerHTML = `
+                        <p><strong>Total Enviados:</strong> ${data.resumo.totalEnviados}</p>
+                        <p><strong>Aguardando Análise:</strong> ${data.resumo.totalPendente}</p>
+                        <hr>
+                    `;
+
+                    // Exibe as imagens e dados
+                    if (data.certificados && data.certificados.length > 0) {
+                        data.certificados.forEach(cert => {
+                            const status = cert.validacao ? cert.validacao.status : 'SEM STATUS';
+                            
+                            divGaleria.innerHTML += `
+                                <div class="certificado-card">
+                                    <h4>${cert.tituloAtividade}</h4>
+                                    <p>Horas Informadas: ${cert.cargaHorariaInformada}h</p>
+                                    <p>Status: <span class="status ${status}">${status}</span></p>
+                                    ${cert.imagem ? `<img src="${cert.imagem}" alt="Certificado">` : '<p><i>Sem imagem</i></p>'}
+                                </div>
+                            `;
+                        });
+                    } else {
+                        divGaleria.innerHTML += "<p>Você ainda não enviou nenhum certificado.</p>";
+                    }
+                }
+
+            } catch (error) {
+                divResposta.innerText = 'Erro de Conexão: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

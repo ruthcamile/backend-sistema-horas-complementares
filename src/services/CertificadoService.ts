@@ -3,23 +3,11 @@ import { CertificadoRepository } from '../repositories/CertificadoRepository';
 const certRepo = new CertificadoRepository();
 
 export class CertificadoService {
-  async enviar(dados: any, alunoId: number, nomeArquivo: string) {
-    const { tituloAtividade, cargaHorariaInformada, dataAtividade, areaId } = dados;
-
-    if (!nomeArquivo) {
-      throw new Error('O arquivo da imagem é obrigatório.');
-    }
-
-    const certificado = await certRepo.create({
-      tituloAtividade,
-      cargaHorariaInformada: Number(cargaHorariaInformada),
-      dataAtividade: new Date(dataAtividade),
-      arquivoImagem: nomeArquivo,
-      alunoId: Number(alunoId),
-      areaId: Number(areaId)
-    });
-
-    return certificado;
+  
+  // 🔥 MÉTODO CORRIGIDO E LIMPO 🔥
+  async enviar(dados: any, alunoId: number, urlDaImagem: string) {
+    // O Repository já espera exatamente esses 3 itens!
+    return await certRepo.create(dados, alunoId, urlDaImagem);
   }
   
   // NOVO MÉTODO
@@ -45,5 +33,4 @@ export class CertificadoService {
     // 3. Executa a mutação
     return await certRepo.atualizarValidacao(certificadoId, status as 'APROVADO' | 'RECUSADO', horas);
   }
-
 }

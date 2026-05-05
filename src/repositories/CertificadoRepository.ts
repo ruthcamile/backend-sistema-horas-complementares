@@ -2,8 +2,30 @@ import { prisma } from '../database/prisma';
 import { Prisma } from '@prisma/client';
 
 export class CertificadoRepository {
-  // ... seu método create atual continua aqui em cima ...
+  
+  // 🔥 O MÉTODO QUE ESTAVA FALTANDO! 🔥
+  async create(dados: any, alunoId: number, urlDaImagem: string) {
+    return await prisma.certificado.create({
+      data: {
+        tituloAtividade: dados.tituloAtividade,
+        cargaHorariaInformada: Number(dados.cargaHorariaInformada),
+        dataAtividade: new Date(dados.dataAtividade), // Converte a data do HTML para o formato do banco
+        alunoId: alunoId,
+        areaId: Number(dados.areaId),
+  
+        arquivoImagem: urlDaImagem, 
 
+        // cria o certificado atrelando a validação inicial como PENDENTE e horas validadas zeradas
+        validacao: {
+          create: {
+            status: 'PENDENTE',
+            horasValidadas: 0
+          }
+        }
+      }
+    });
+  }
+  
   // NOVO MÉTODO PARA O DASHBOARD DO ALUNO
   async findByAlunoId(alunoId: number) {
     const certificados = await prisma.certificado.findMany({

@@ -9,9 +9,9 @@ export class CertificadoController {
   async enviar(req: Request, res: Response) {
     try {
       const alunoId = (req as any).user.id; 
-      const nomeArquivo = req.file?.filename || '';
+      const urlDaImagem = (req.file as any).location; // Pega o link completo gerado pelo S3
 
-      const certificado = await certService.enviar(req.body, alunoId, nomeArquivo);
+      const certificado = await certService.enviar(req.body, alunoId, urlDaImagem);
 
       return res.status(201).json(certificado);
     } catch (error: any) {
@@ -35,8 +35,6 @@ export class CertificadoController {
 // NOVO MÉTODO: Fila do Coordenador
   async listarPendentes(req: Request, res: Response) {
     try {
-      // Futuramente podemos colocar uma trava de segurança aqui para garantir 
-      // que o (req as any).user.role === 'COORDENADOR'
       
       const pendentes = await certService.listarPendentes();
 
@@ -65,5 +63,4 @@ export class CertificadoController {
       return res.status(400).json({ erro: error.message });
     }
   }
-
 }
