@@ -98,7 +98,7 @@
 
             try {
                 // Chama a rota PATCH para atualizar o certificado
-                const response = await fetch(`http://localhost:3000/api/certificados/${certificadoId}/validar`, {
+                const response = await fetch(`https://backend-sistema-horas-complementares.onrender.com/api/certificados/${certificadoId}/validar`, {
                     method: 'PATCH', // Usamos PATCH pois estamos apenas atualizando uma parte do dado
                     headers: {
                         'Authorization': `Bearer ${token}`,
