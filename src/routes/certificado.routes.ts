@@ -1,12 +1,15 @@
 // src/routes/certificado.routes.ts
 import { Router } from 'express';
-import { CertificadoController } from '../controllers/CertificadoController';
+import { CertificadoController, listarAreas } from '../controllers/CertificadoController';
 import { authMiddleware } from '../middlewares/authMiddleware';
 import { checkRole } from '../middlewares/roleMiddleware';
 import { upload } from '../config/multer';
 
 const certificadoRoutes = Router();
 const certificadoController = new CertificadoController();
+
+// 4. Rota para listar áreas de atividade (GET)
+certificadoRoutes.get('/areas', authMiddleware, listarAreas);
 
 // 1. Rota de Upload (POST)
 certificadoRoutes.post(
