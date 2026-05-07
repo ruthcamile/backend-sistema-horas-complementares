@@ -49,7 +49,7 @@ export const getDashboardAluno = async (req: Request, res: Response): Promise<an
     });
 
     // 3. Transforma o mapa de volta num formato de lista para o Frontend fazer o map()
-    // Vai ficar assim: [{ area: "Ensino", horas: 40 }, { area: "Pesquisa e Inovacao", horas: 60 }]
+    // [{ area: "Ensino", horas: 40 }, { area: "Pesquisa e Inovacao", horas: 60 }]
     const distribuicaoPorAtividade = Object.keys(distribuicaoMap).map(key => ({
       area: key,
       horas: distribuicaoMap[key]

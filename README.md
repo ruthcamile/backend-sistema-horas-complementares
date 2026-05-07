@@ -9,7 +9,7 @@
 <img src="https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" />
 <img src="https://img.shields.io/badge/Aiven-FF3621?style=for-the-badge&logo=aiven&logoColor=white" />
 
-# 🎓 SGH — Sistema de Gestão de Horas Complementares
+# SGH — Sistema de Gestão de Horas Complementares
 
 **API REST para controle e validação de horas extracurriculares acadêmicas.**  
 Projeto Integrador · 3° Período · Análise e Desenvolvimento de Sistemas
@@ -18,7 +18,7 @@ Projeto Integrador · 3° Período · Análise e Desenvolvimento de Sistemas
 
 ---
 
-## 📌 Sobre o Projeto
+## Sobre o Projeto
 
 O **SGH (Sistema de Gestão de Horas Complementares)** é uma solução desenvolvida para **digitalizar e automatizar** o processo de envio, análise e validação de certificados extracurriculares em instituições de ensino superior.
 
@@ -28,7 +28,7 @@ Antes do sistema, o controle de horas complementares era feito de forma manual �
 
 ---
 
-## 🎯 Objetivos
+## Objetivos
 
 - Eliminar o controle manual e descentralizado de horas complementares
 - Oferecer um fluxo digital de envio, análise e aprovação de certificados
@@ -38,15 +38,15 @@ Antes do sistema, o controle de horas complementares era feito de forma manual �
 
 ---
 
-## ✨ Funcionalidades
+## Funcionalidades
 
-### 👩‍🎓 Perfil Aluno
+### Perfil Aluno
 - Cadastro e autenticação segura via e-mail e senha
 - Upload de certificados (PDF ou imagem) diretamente pela plataforma
 - Acompanhamento em tempo real do status de cada submissão (Pendente, Aprovado, Reprovado)
 - Dashboard pessoal com total de certificados enviados, aprovados e carga horária acumulada
 
-### 👨‍💼 Perfil Coordenador
+### Perfil Coordenador
 - Painel de validação com fila de certificados pendentes
 - Visualização dos documentos armazenados na nuvem
 - Aprovação ou rejeição de certificados com registro de observação
@@ -54,7 +54,7 @@ Antes do sistema, o controle de horas complementares era feito de forma manual �
 
 ---
 
-## 🏗️ Arquitetura do Projeto
+## Arquitetura do Projeto
 
 ```
 ┌─────────────────────────────────────────────────────┐
@@ -89,7 +89,7 @@ Antes do sistema, o controle de horas complementares era feito de forma manual �
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 | Camada | Tecnologia | Finalidade |
 |---|---|---|
@@ -106,7 +106,7 @@ Antes do sistema, o controle de horas complementares era feito de forma manual �
 
 ---
 
-## 🗂️ Estrutura de Pastas
+## Estrutura de Pastas
 
 ```
 backend-sistema-horas-complementares/
@@ -141,7 +141,7 @@ backend-sistema-horas-complementares/
 
 ---
 
-## 🔌 Rotas da API
+## Rotas da API
 
 | Método | Rota | Descrição | Autenticação |
 |---|---|---|---|
@@ -152,11 +152,11 @@ backend-sistema-horas-complementares/
 | `PATCH` | `/api/certificados/:id/validar` | Aprovar ou rejeitar certificado | ✅ Coordenador |
 | `GET` | `/api/dashboard` | Métricas de horas e envios | ✅ Ambos |
 
-> 💡 Recomendamos o uso do [Postman](https://www.postman.com/) ou [Thunder Client](https://www.thunderclient.com/) para testar as rotas.
+> Recomendamos o uso do [Postman](https://www.postman.com/) ou [Thunder Client](https://www.thunderclient.com/) para testar as rotas.
 
 ---
 
-## 🚀 Como Rodar Localmente
+## Como Rodar Localmente
 
 ### Pré-requisitos
 - [Node.js](https://nodejs.org/) v18+
@@ -213,7 +213,7 @@ O servidor estará disponível em `http://localhost:3000` 🟢
 
 ---
 
-## 🗃️ Modelo de Dados
+## Modelo de Dados
 
 O banco de dados foi modelado a partir de um diagrama ER e implementado com Prisma ORM. As principais entidades são:
 
@@ -230,7 +230,7 @@ Usuario ──── Aluno ──────── Certificado ──── Val
 
 ---
 
-## 🌐 Deploy
+## Deploy
 
 | Serviço | Plataforma | Descrição |
 |---|---|---|
@@ -240,26 +240,22 @@ Usuario ──── Aluno ──────── Certificado ──── Val
 
 ---
 
-## 👥 Equipe
+## Equipe
 
 Projeto desenvolvido por estudantes do **3° Período de Análise e Desenvolvimento de Sistemas** como parte da disciplina de Projeto Integrador.
 
 | Nome | LinkedIn | GitHub |
 |---|---|---|
-| Ruth Camile | [LinkedIn](#) | [GitHub](https://github.com/ruthcamile) |
-| [Integrante 2] | [LinkedIn](#) | [GitHub](#) |
-| [Integrante 3] | [LinkedIn](#) | [GitHub](#) |
+| Ruth Camile | [LinkedIn](https://www.linkedin.com/in/ruth-camile-7b6210295/) | [GitHub](https://github.com/ruthcamile) |
+| Morgana Barbosa | [LinkedIn](https://www.linkedin.com/in/morganabarbosa1212/) | [GitHub](https://github.com/Morganabarbs) |
+| Luis Augusto | [LinkedIn](https://www.linkedin.com/in/luis-augusto-61980235a/) | [GitHub](https://github.com/LuisWebCoding) |
+| Igor Alves | [LinkedIn](https://www.linkedin.com/in/igor-alves15) | [GitHub](https://github.com/igor-araujo-15) |
 
 ---
-
-## 📄 Licença
-
-Este projeto está sob a licença MIT. Consulte o arquivo [LICENSE](LICENSE) para mais detalhes.
-
 ---
 
 <div align="center">
 
-Feito com 💙 por estudantes de ADS · Projeto Integrador 3° Período
+Feito com por estudantes de ADS · Projeto Integrador 3° Período
 
 </div>
