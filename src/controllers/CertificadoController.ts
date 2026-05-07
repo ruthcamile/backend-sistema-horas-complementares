@@ -1,7 +1,22 @@
 import { Request, Response } from 'express';
 import { CertificadoService } from '../services/CertificadoService';
+import { prisma } from '../database/prisma';
 
 const certService = new CertificadoService();
+
+// MÉTODO: Area de Atividade para o formulário de envio de certificado
+export const listarAreas = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const areas = await prisma.areaAtividade.findMany({
+      select: { id: true, nome: true }
+    });
+    
+    return res.json(areas);
+  } catch (error) {
+    console.error("Erro ao buscar áreas:", error);
+    return res.status(500).json({ erro: "Erro ao buscar as áreas de atividade." });
+  }
+};
 
 export class CertificadoController {
   

@@ -46,7 +46,7 @@
 
             try {
                 // Chama a rota GET de pendentes
-                const response = await fetch('http://localhost:3000/api/certificados/pendentes', {
+                const response = await fetch('https://backend-sistema-horas-complementares.onrender.com/api/certificados/pendentes', {
                     method: 'GET',
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
