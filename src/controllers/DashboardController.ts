@@ -3,50 +3,67 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+// Como o seu banco (schema.prisma) não tem um campo fixo de horas totais do curso, 
+// vamos definir essa regra de negócio aqui. Fica fácil de mudar depois!
+const TOTAL_HORAS_EXIGIDAS = 100; 
+
 export const getDashboardAluno = async (req: Request, res: Response): Promise<any> => {
   try {
     const usuarioDoToken = (req as any).user;
-    console.log("1. O que veio no token?", usuarioDoToken); // Vai aparecer no terminal do VS Code/Render
-
-    // Isso cobre as duas possibilidades de como você pode ter salvo o ID!
     const alunoId = usuarioDoToken.id || usuarioDoToken.userId; 
-    console.log("2. ID do aluno extraído:", alunoId);
 
     if (!alunoId) {
        return res.status(400).json({ erro: "O ID do aluno não veio dentro do token." });
     }
 
-    console.log("3. Buscando certificados enviados...");
-    const totalEnviados = await prisma.certificado.count({
-      where: { alunoId: Number(alunoId) }
-    });
-
-    console.log("4. Buscando certificados aprovados...");
-    const totalAprovados = await prisma.certificado.count({
+    // 1. Busca todos os certificados APROVADOS do aluno e traz a Área e a Validação junto
+    const certificadosAprovados = await prisma.certificado.findMany({
       where: {
         alunoId: Number(alunoId),
         validacao: { status: 'APROVADO' }
+      },
+      include: {
+        area: true,       // Precisamos do nome da área (Ensino, Pesquisa...)
+        validacao: true   // Precisamos das horas que o coordenador validou
       }
     });
 
-    console.log("5. Somando horas...");
-    const agregacaoHoras = await prisma.validacao.aggregate({
-      _sum: { horasValidadas: true },
-      where: {
-        status: 'APROVADO',
-        certificado: { alunoId: Number(alunoId) }
+    // 2. Fazendo a matemática de Agrupamento e Soma
+    let horasConcluidas = 0;
+    const distribuicaoMap: Record<string, number> = {};
+
+    certificadosAprovados.forEach(cert => {
+      // Pega as horas aprovadas (se não tiver, é 0)
+      const horas = cert.validacao?.horasValidadas || 0;
+      
+      // Soma no total geral
+      horasConcluidas += horas;
+
+      // Soma no total da categoria específica
+      const nomeArea = cert.area.nome;
+      if (distribuicaoMap[nomeArea]) {
+        distribuicaoMap[nomeArea] += horas;
+      } else {
+        distribuicaoMap[nomeArea] = horas;
       }
     });
 
-    const horasAcumuladas = agregacaoHoras._sum.horasValidadas || 0;
-    
-    console.log("6. Sucesso absoluto! Retornando os dados.");
-    return res.json({ totalEnviados, totalAprovados, horasAcumuladas });
+    // 3. Transforma o mapa de volta num formato de lista para o Frontend fazer o map()
+    // Vai ficar assim: [{ area: "Ensino", horas: 40 }, { area: "Pesquisa e Inovacao", horas: 60 }]
+    const distribuicaoPorAtividade = Object.keys(distribuicaoMap).map(key => ({
+      area: key,
+      horas: distribuicaoMap[key]
+    }));
+
+    // Retorna o JSON prontinho!
+    return res.json({ 
+      totalExigido: TOTAL_HORAS_EXIGIDAS,
+      horasConcluidas,
+      distribuicaoPorAtividade 
+    });
 
   } catch (error) {
     console.error("❌ ERRO FATAL NO DASHBOARD:", error);
-    
-    // Agora ele vai mandar o ERRO VERDADEIRO para o Thunder Client!
     return res.status(500).json({ 
         erro: "O servidor quebrou!", 
         detalhe: error instanceof Error ? error.message : "Erro desconhecido" 
