@@ -4,6 +4,7 @@ import cors from 'cors';
 import * as dotenv from 'dotenv';
 import { authRoutes } from './routes/auth.routes'; 
 import { certificadoRoutes } from './routes/certificado.routes';
+import { dashboardRoutes } from './routes/dashboard.routes';
 
 dotenv.config(); 
 
@@ -15,6 +16,7 @@ app.use(express.json());
 // Registrando a rota de autenticação (Tudo que for /api/auth vai para aquele arquivo)
 app.use('/api/auth', authRoutes); 
 app.use('/api/certificados', certificadoRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 app.get('/health', (req, res) => {
   return res.json({ status: 'OK' });
