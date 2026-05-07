@@ -1,7 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
-const SECRET = process.env.JWT_SECRET || 'minha-chave-secreta-super-segura-2024';
+const SECRET = process.env.JWT_SECRET;
+
+if (!SECRET) {
+  throw new Error("Vazamento de segurança crítico: JWT_SECRET não está definida no ambiente.");
+}
 
 export function authMiddleware(req: Request, res: Response, next: NextFunction): void {
   const authHeader = req.headers.authorization;
