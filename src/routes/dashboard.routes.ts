@@ -1,10 +1,14 @@
 import { Router } from 'express';
-import { getDashboardAluno } from '../controllers/DashboardController';
+import { getDashboardAluno, getDashboardCoordenador } from '../controllers/DashboardController';
 import { authMiddleware } from '../middlewares/authMiddleware';
+
 
 const dashboardRoutes = Router();
 
-// A rota fica protegida: só quem tem token entra
-dashboardRoutes.get('/', authMiddleware, getDashboardAluno);
+// Rota para o Aluno
+dashboardRoutes.get('/aluno', authMiddleware, getDashboardAluno);
+
+// Rota para o Coordenador
+dashboardRoutes.get('/coordenador', authMiddleware, getDashboardCoordenador);
 
 export { dashboardRoutes };

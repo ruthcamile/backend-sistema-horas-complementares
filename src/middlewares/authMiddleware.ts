@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
-const SECRET = process.env.JWT_SECRET || 'minha-chave-secreta-super-segura-2024';
+const SECRET = process.env.JWT_SECRET || 'minha-chave-secreta-super-segura-2026';
 
 export function authMiddleware(req: Request, res: Response, next: NextFunction): void {
   const authHeader = req.headers.authorization;
