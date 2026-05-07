@@ -63,7 +63,7 @@ export const getDashboardAluno = async (req: Request, res: Response): Promise<an
     });
 
   } catch (error) {
-    console.error("❌ ERRO FATAL NO DASHBOARD:", error);
+    console.error("ERRO FATAL NO DASHBOARD:", error);
     return res.status(500).json({ 
         erro: "O servidor quebrou!", 
         detalhe: error instanceof Error ? error.message : "Erro desconhecido" 
