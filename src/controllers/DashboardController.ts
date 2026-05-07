@@ -5,10 +5,19 @@ const prisma = new PrismaClient();
 
 export const getDashboardAluno = async (req: Request, res: Response): Promise<any> => {
   try {
-    // ⚠️ Mude req.userId para a forma como o seu authMiddleware guarda o ID do usuário
-    const alunoId = (req as any).userId; 
+    
+    // Pegando o ID do usuário de dentro do objeto 'user' que o middleware criou!
+    // Se no seu token você salvou como "id", use assim:
+    const alunoId = (req as any).user.id; 
+    
+    // (Se por acaso você salvou como "userId" no momento do login, seria: (req as any).user.userId)
 
-    // 1. Quantidade de certificados enviados (Total geral daquele aluno)
+    // Se o ID ainda vier vazio, a gente para o processo antes de quebrar o Prisma
+    if (!alunoId) {
+       return res.status(400).json({ erro: "ID do aluno não encontrado no token." });
+    }
+
+    // 1. Quantidade de certificados enviados...
     const totalEnviados = await prisma.certificado.count({
       where: { alunoId: Number(alunoId) }
     });
