@@ -20,11 +20,13 @@ export const listarAreas = async (req: Request, res: Response): Promise<any> => 
 
 export class CertificadoController {
   
-  // Método de upload que já estava funcionando
+  // Método de upload 
   async enviar(req: Request, res: Response) {
     try {
       const alunoId = (req as any).user.id; 
-      const urlDaImagem = (req.file as any).location; // Pega o link completo gerado pelo S3
+      
+      // O link gerado pelo seu middleware de upload (Multer) entra aqui
+      const urlDaImagem = (req.file as any).location || (req.file as any).path; 
 
       const certificado = await certService.enviar(req.body, alunoId, urlDaImagem);
 
@@ -47,10 +49,9 @@ export class CertificadoController {
     }
   }
 
-// NOVO MÉTODO: Fila do Coordenador
+  // NOVO MÉTODO: Fila do Coordenador
   async listarPendentes(req: Request, res: Response) {
     try {
-      
       const pendentes = await certService.listarPendentes();
 
       return res.status(200).json(pendentes);
