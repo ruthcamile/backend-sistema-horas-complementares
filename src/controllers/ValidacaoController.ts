@@ -60,7 +60,7 @@ export const avaliarCertificado = async (req: Request, res: Response): Promise<a
       where: { id: Number(idValidacao) },
       data: {
         status,
-        horasValidadas: status === 'APROVADO' ? Number(horasValidadas) : 0,
+        hhorasValidadas: status === 'APROVADO' ? Number(horasValidadas || 0) : 0, // vai arantir que o Number nunca tente converter algo nulo
         observacao: observacao || null,
         dataValidacao: new Date()
       }
@@ -74,5 +74,43 @@ export const avaliarCertificado = async (req: Request, res: Response): Promise<a
   } catch (error) {
     console.error("Erro ao avaliar certificado:", error);
     return res.status(500).json({ erro: "Erro ao registrar a avaliação." });
+  }
+};
+
+// 3. Rota para o coordenador buscar os certificados de um aluno específico pela matrícula (GET)
+export const buscarCertificadosPorMatricula = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { matricula } = req.params;
+
+    // Buscamos o aluno pela matrícula e já trazemos os certificados e as áreas de atividade relacionadas a ele
+    const aluno = await prisma.user.findUnique({
+      where: {
+        matricula: String(matricula)
+      },
+      select: {
+        id: true,
+        nome: true,
+        email: true,
+        matricula: true,
+        departamento: true,
+        // Incluímos os certificados e os detalhes de cada um
+        certificados: {
+          include: {
+            area: { select: { nome: true } },
+            validacao: true
+          }
+        }
+      }
+    });
+
+    if (!aluno) {
+      return res.status(404).json({ erro: "Aluno não encontrado com esta matrícula." });
+    }
+
+    return res.json(aluno);
+
+  } catch (error) {
+    console.error("Erro ao buscar por matrícula:", error);
+    return res.status(500).json({ erro: "Erro interno ao realizar a busca." });
   }
 };
