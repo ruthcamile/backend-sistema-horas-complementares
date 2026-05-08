@@ -60,7 +60,7 @@ export const avaliarCertificado = async (req: Request, res: Response): Promise<a
       where: { id: Number(idValidacao) },
       data: {
         status,
-        hhorasValidadas: status === 'APROVADO' ? Number(horasValidadas || 0) : 0, // vai arantir que o Number nunca tente converter algo nulo
+        horasValidadas: status === 'APROVADO' ? Number(horasValidadas || 0) : 0, // vai garantir que o Number nunca tente converter algo nulo
         observacao: observacao || null,
         dataValidacao: new Date()
       }
