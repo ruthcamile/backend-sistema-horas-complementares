@@ -44,7 +44,7 @@ export const listarFilaValidacao = async (req: Request, res: Response): Promise<
   }
 };
 
-// 2. Rota para EXECUTAR a validação (POST/PATCH) - Você vai precisar disso logo em seguida!
+// 2. Rota para EXECUTAR a validação (POST/PATCH)
 export const avaliarCertificado = async (req: Request, res: Response): Promise<any> => {
   try {
     const { idValidacao } = req.params;

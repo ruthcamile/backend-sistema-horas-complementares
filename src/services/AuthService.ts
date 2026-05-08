@@ -5,8 +5,7 @@ import jwt from 'jsonwebtoken';
 import { Role } from '@prisma/client';
 
 const userRepository = new UserRepository();
-// Em produção, isso ficaria no seu .env
-const SECRET = process.env.JWT_SECRET || 'minha-chave-secreta-super-segura-2024';
+const SECRET = process.env.JWT_SECRET;
 
 export class AuthService {
   async cadastrar(dados: any) {

@@ -3,8 +3,8 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-// Como o seu banco (schema.prisma) não tem um campo fixo de horas totais do curso, 
-// vamos definir essa regra de negócio aqui. Fica fácil de mudar depois!
+// Como o banco (schema.prisma) não tem um campo fixo de horas totais do curso, 
+// é definido aqui essa regra de negócio, fica mais facil de mudar dps
 const TOTAL_HORAS_EXIGIDAS = 100; 
 
 export const getDashboardAluno = async (req: Request, res: Response): Promise<any> => {

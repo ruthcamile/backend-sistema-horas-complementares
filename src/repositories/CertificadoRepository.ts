@@ -3,7 +3,7 @@ import { Prisma } from '@prisma/client';
 
 export class CertificadoRepository {
   
-  // 🔥 O MÉTODO QUE ESTAVA FALTANDO! 🔥
+  // MÉTODO DE CRIAÇÃO DE CERTIFICADO
   async create(dados: any, alunoId: number, urlDaImagem: string) {
     return await prisma.certificado.create({
       data: {
