@@ -4,23 +4,23 @@ const certRepo = new CertificadoRepository();
 
 export class CertificadoService {
   
-  // 🔥 MÉTODO CORRIGIDO E LIMPO 🔥
+  // MÉTODO DE ENVIO DE CERTIFICADO
   async enviar(dados: any, alunoId: number, urlDaImagem: string) {
     // O Repository já espera exatamente esses 3 itens!
     return await certRepo.create(dados, alunoId, urlDaImagem);
   }
   
-  // NOVO MÉTODO
+  // MÉTODO DE LISTAGEM DE CERTIFICADOS DO ALUNO
   async listarMeus(alunoId: number) {
     return await certRepo.findByAlunoId(alunoId);
   }
 
-  // NOVO MÉTODO: Fila do Coordenador
+  // MÉTODO: Fila do Coordenador - Listar os certificados pendentes
   async listarPendentes() {
     return await certRepo.findPendentes();
   }
 
-  // NOVO MÉTODO: Lógica de Validação do Coordenador
+  // NOVO MÉTODO: Lógica de Validação do Coordenador - Aprovar ou Recusar um certificado
   async validarCertificado(certificadoId: number, status: string, horasValidadas?: number) {
     // 1. Valida se o status enviado é válido pelas constraints do Enum
     if (status !== 'APROVADO' && status !== 'RECUSADO') {

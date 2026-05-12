@@ -18,7 +18,7 @@ export class AuthService {
     }
 
     // 2. Criptografa a senha (10 rounds de salt)
-    const senhaHash = await bcrypt.hash(senha, 10);
+    const senhaHash = await bcrypt.hash(senha, 10); // 10 é o número de interações de hash(rounds de salt), o que é considerado seguro para a maioria dos casos
 
     // 3. Salva no banco
     const novoUsuario = await userRepository.create({
