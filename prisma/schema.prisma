@@ -7,6 +7,64 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id           Int           @id @default(autoincrement())
+  nome         String
+  email        String        @unique
+  senha        String
+  role         Role          @default(ALUNO)
+  matricula    String?       @unique
+  departamento String?
+  certificados Certificado[]
+}
+
+model AreaAtividade {
+  id              Int           @id @default(autoincrement())
+  nome            String
+  limiteHorasArea Float
+  certificados    Certificado[]
+}
+
+model Certificado {
+  id                    Int           @id @default(autoincrement())
+  tituloAtividade       String
+  cargaHorariaInformada Float
+  dataAtividade         DateTime
+  arquivoImagem         String
+  dataEnvio             DateTime      @default(now())
+  alunoId               Int
+  areaId                Int
+  aluno                 User          @relation(fields: [alunoId], references: [id])
+  area                  AreaAtividade @relation(fields: [areaId], references: [id])
+  validacao             Validacao?
+
+  @@index([alunoId], map: "Certificado_alunoId_fkey")
+  @@index([areaId], map: "Certificado_areaId_fkey")
+}
+
+model Validacao {
+  id             Int             @id @default(autoincrement())
+  status         StatusValidacao @default(PENDENTE)
+  observacao     String?         @db.Text
+  horasValidadas Float?
+  dataValidacao  DateTime?
+  certificadoId  Int             @unique
+  certificado    Certificado     @relation(fields: [certificadoId], references: [id])
+}
+
+model Curso {
+  id                   BigInt @id @unique(map: "id") @default(autoincrement()) @db.UnsignedBigInt
+  nome                 String @db.VarChar(255)
+  total_horas_exigidas Int?   @default(200)
+}
+
+model UsuarioCurso {
+  user_id  Int
+  curso_id Int
+
+  @@id([user_id, curso_id])
+}
+
 enum Role {
   ALUNO
   COORDENADOR
@@ -16,56 +74,4 @@ enum StatusValidacao {
   PENDENTE
   APROVADO
   RECUSADO
-}
-
-model User {
-  id           Int     @id @default(autoincrement())
-  nome         String
-  email        String  @unique
-  senha        String
-  role         Role    @default(ALUNO)
-  matricula    String? @unique
-  departamento String?
-  
-  // Relacionamento: Um aluno pode ter vários certificados
-  certificados Certificado[]
-}
-
-model AreaAtividade {
-  id              Int    @id @default(autoincrement())
-  nome            String
-  limiteHorasArea Float
-
-  certificados    Certificado[]
-}
-
-model Certificado {
-  id                    Int      @id @default(autoincrement())
-  tituloAtividade       String
-  cargaHorariaInformada Float
-  dataAtividade         DateTime
-  arquivoImagem         String
-  dataEnvio             DateTime @default(now())
-
-  // Relacionamento com o Aluno
-  alunoId Int
-  aluno   User @relation(fields: [alunoId], references: [id])
-
-  // Relacionamento com a Área de Atividade
-  areaId  Int
-  area    AreaAtividade @relation(fields: [areaId], references: [id])
-
-  // Relacionamento 1:1 com a Validação
-  validacao Validacao?
-}
-
-model Validacao {
-  id             Int             @id @default(autoincrement())
-  status         StatusValidacao @default(PENDENTE)
-  observacao     String?         @db.Text
-  horasValidadas Float?
-  dataValidacao  DateTime?
-
-  certificadoId  Int             @unique
-  certificado    Certificado     @relation(fields: [certificadoId], references: [id])
 }
