@@ -15,6 +15,7 @@ model User {
   role         Role          @default(ALUNO)
   matricula    String?       @unique
   departamento String?
+  cursos       CursosNoUser[]
   certificados Certificado[]
 }
 
@@ -56,13 +57,18 @@ model Curso {
   id                   BigInt @id @unique(map: "id") @default(autoincrement()) @db.UnsignedBigInt
   nome                 String @db.VarChar(255)
   total_horas_exigidas Int?   @default(200)
+  usuarios             CursosNoUser[]
 }
 
-model UsuarioCurso {
-  user_id  Int
-  curso_id Int
+model CursosNoUser {
+  userId  Int
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // ADICIONE @db.UnsignedBigInt AQUI PARA FICAR IGUAL AO ID DO CURSO:
+  cursoId BigInt @db.UnsignedBigInt
+  curso   Curso  @relation(fields: [cursoId], references: [id], onDelete: Cascade)
 
-  @@id([user_id, curso_id])
+  @@id([userId, cursoId])
 }
 
 enum Role {

@@ -16,6 +16,37 @@ export const getDashboardAluno = async (req: Request, res: Response): Promise<an
        return res.status(400).json({ erro: "O ID do aluno não veio dentro do token." });
     }
 
+    // 1. Buscar o usuário e os cursos que ele está matriculado 
+    // (para mostrar no dropdown e pegar as horas exigidas)
+
+    const usuarioComCursos = await prisma.user.findUnique({
+      where: { id: Number(alunoId) },
+      include: {
+        cursos: {
+          include: {
+            curso: true
+          }
+        }
+      }
+    });
+
+    //  Transformar os dados dos cursos para um formato mais amigável pro frontend
+    const listaDeCursos = usuarioComCursos?.cursos.map(uc => ({
+      id: Number(uc.curso.id), 
+      nome: uc.curso.nome,
+      totalHorasExigidas: (uc.curso as any).total_horas_exigidas || (uc.curso as any).totalHorasExigidas || TOTAL_HORAS_EXIGIDAS
+    })) || [];
+
+    let totalExigido = TOTAL_HORAS_EXIGIDAS;
+    if (cursoIdQuery) {
+      const cursoFiltrado = listaDeCursos.find(c => c.id === Number(cursoIdQuery));
+      if (cursoFiltrado) {
+        totalExigido = cursoFiltrado.totalHorasExigidas;
+      }
+    } else if (listaDeCursos.length > 0) {
+      totalExigido = listaDeCursos[0].totalHorasExigidas;
+    }
+
     // 1. Busca todos os certificados APROVADOS do aluno e traz a Área e a Validação junto
     const certificadosAprovados = await prisma.certificado.findMany({
       where: {
@@ -57,9 +88,10 @@ export const getDashboardAluno = async (req: Request, res: Response): Promise<an
 
     // Retorna o JSON prontinho!
     return res.json({ 
-      totalExigido: TOTAL_HORAS_EXIGIDAS,
+      totalExigido,
       horasConcluidas,
-      distribuicaoPorAtividade 
+      distribuicaoPorAtividade,
+      cursos: listaDeCursos.map(c => ({ id: c.id, nome: c.nome }))
     });
 
   } catch (error) {
