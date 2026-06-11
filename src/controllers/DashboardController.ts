@@ -16,6 +16,8 @@ export const getDashboardAluno = async (req: Request, res: Response): Promise<an
        return res.status(400).json({ erro: "O ID do aluno não veio dentro do token." });
     }
 
+    const cursoIdQuery = req.query.cursoId as string | undefined;
+
     // 1. Buscar o usuário e os cursos que ele está matriculado 
     // (para mostrar no dropdown e pegar as horas exigidas)
 
