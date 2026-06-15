@@ -4,11 +4,17 @@ import { prisma } from '../database/prisma';
 
 const certService = new CertificadoService();
 
-// MÉTODO: Area de Atividade para o formulário de envio de certificado
+// Esse método é para listar as áreas de atividade e suas subcategorias, usado no formulário de envio de certificado
 export const listarAreas = async (req: Request, res: Response): Promise<any> => {
   try {
     const areas = await prisma.areaAtividade.findMany({
-      select: { id: true, nome: true }
+      select: { 
+        id: true, 
+        nome: true,
+        subcategorias: { // Traz a subcategoria junto!
+          select: { id: true, nome: true }
+        }
+      }
     });
     
     return res.json(areas);
@@ -19,16 +25,47 @@ export const listarAreas = async (req: Request, res: Response): Promise<any> => 
 };
 
 export class CertificadoController {
+
+
+
+  // 3. NOVO MÉTODO: Detalhes do Certificado
+  async detalhar(req: Request, res: Response): Promise<any> {
+    try {
+      const { id } = req.params;
+      const certificado = await prisma.certificado.findUnique({
+        where: { id: Number(id) },
+        include: {
+          area: true,
+          subcategoria: true,
+          curso: true,
+          validacao: true // Traz o histórico, incluindo observação de recusa
+        }
+      });
+
+      if (!certificado) return res.status(404).json({ erro: "Certificado não encontrado." });
+
+      return res.json(certificado);
+    } catch (error: any) {
+      return res.status(500).json({ erro: "Erro ao buscar detalhes do certificado." });
+    }
+  }
   
-  // Método de upload 
-  async enviar(req: Request, res: Response) {
+  // Método de upload
+  async enviar(req: Request, res: Response): Promise<any> {
     try {
       const alunoId = (req as any).user.id; 
-      
-      // O link gerado pelo seu middleware de upload (Multer) entra aqui
       const urlDaImagem = (req.file as any).location || (req.file as any).path; 
 
-      const certificado = await certService.enviar(req.body, alunoId, urlDaImagem);
+      // req.body agora deve trazer cursoId e subcategoriaId do frontend
+      // Transformamos em Number pois form-data envia tudo como string
+      const dadosTratados = {
+        ...req.body,
+        cursoId: Number(req.body.cursoId),
+        subcategoriaId: Number(req.body.subcategoriaId),
+        areaId: Number(req.body.areaId)
+      };
+
+      const certificado = await certService.enviar(dadosTratados, alunoId, urlDaImagem);
 
       return res.status(201).json(certificado);
     } catch (error: any) {
@@ -36,7 +73,7 @@ export class CertificadoController {
     }
   }
 
-  // NOVO MÉTODO
+  // MÉTODO RECUPERADO: Lista os certificados do aluno
   async listarMeus(req: Request, res: Response) {
     try {
       const alunoId = (req as any).user.id; 
@@ -49,8 +86,28 @@ export class CertificadoController {
     }
   }
 
+  // NOVO MÉTODO
+  async listarMeusCursos(req: Request, res: Response): Promise<any> {
+    try {
+      const alunoId = (req as any).user.id;
+      
+      // Busca na tabela pivô trazendo os dados do curso junto
+      const vinculos = await prisma.usuariosCursos.findMany({
+        where: { usuarioId: Number(alunoId) },
+        include: { curso: true }
+      });
+
+      // Mapeia para retornar apenas a lista de cursos limpa pro front
+      const cursos = vinculos.map(v => v.curso);
+
+      return res.json(cursos);
+    } catch (error: any) {
+      return res.status(500).json({ erro: "Erro ao buscar cursos." });
+    }
+  }
+
   // NOVO MÉTODO: Fila do Coordenador
-  async listarPendentes(req: Request, res: Response) {
+  async listarPendentes(req: Request, res: Response): Promise<any> {
     try {
       const pendentes = await certService.listarPendentes();
 
@@ -61,7 +118,7 @@ export class CertificadoController {
   }
 
   // NOVO MÉTODO: Controlador de Validação
-  async validar(req: Request, res: Response) {
+  async validar(req: Request, res: Response): Promise<any> {
     try {
       // Pega o ID que vem na URL (ex: /api/certificados/1/validar)
       const { id } = req.params; 
