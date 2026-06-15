@@ -8,10 +8,26 @@ import { upload } from '../config/multer';
 const certificadoRoutes = Router();
 const certificadoController = new CertificadoController();
 
-// 4. Rota para listar áreas de atividade (GET)
+
+// ==========================================
+// ROTAS DE ÁREAS E CURSOS
+// ==========================================
+
+// 1. Lista as áreas com suas subcategorias (Hierárquico)
 certificadoRoutes.get('/areas', authMiddleware, listarAreas);
 
-// 1. Rota de Upload (POST)
+// 2. Lista os cursos do aluno logado
+certificadoRoutes.get('/cursos-do-aluno', authMiddleware, certificadoController.listarMeusCursos);
+
+
+// ==========================================
+// ROTAS DE CERTIFICADOS (ALUNO)
+// ==========================================
+
+// 3. Lista os certificados do aluno logado
+certificadoRoutes.get('/meus', authMiddleware, certificadoController.listarMeus);
+
+// 4. Envio de certificado (Com o multer para upload do arquivo)
 certificadoRoutes.post(
   '/enviar', 
   authMiddleware, 
@@ -19,31 +35,34 @@ certificadoRoutes.post(
   certificadoController.enviar
 );
 
-// 2. Rota de Listagem do Aluno (GET)
-certificadoRoutes.get('/meus', authMiddleware, certificadoController.listarMeus);
 
-// Rota de Listagem do Coordenador (GET) - protegidas por autenticação e role
+// ==========================================
+// ROTAS DE VALIDAÇÃO (COORDENADOR)
+// ==========================================
+
+// 5. Listar certificados pendentes na fila
 certificadoRoutes.get(
   '/pendentes', 
   authMiddleware, 
-  checkRole(['COORDENADOR']), // <--- TRAVA DE ROLE AQUI
+  checkRole(['COORDENADOR']),
   certificadoController.listarPendentes
 );
 
-// Rota de Validação pelo Coordenador (PATCH) - protegida por autenticação e role
+// 6. Aprovar/Recusar certificado
 certificadoRoutes.patch(
   '/:id/validar', 
   authMiddleware, 
-  checkRole(['COORDENADOR']), // <--- TRAVA DE ROLE AQUI
-  certificadoController.validar
-);
-
-// 3. Rota de Validação do Coordenador (PATCH)
-certificadoRoutes.patch(
-  '/:id/validar',
-  authMiddleware,
   checkRole(['COORDENADOR']),
   certificadoController.validar
 );
+
+
+// ==========================================
+// ROTAS DINÂMICAS
+// ==========================================
+
+// 7. Traz os detalhes de um certificado específico
+// IMPORTANTE: Rotas com ":id" precisam ficar no final para o Express não confundir a palavra "meus" ou "pendentes" com um ID.
+certificadoRoutes.get('/:id', authMiddleware, certificadoController.detalhar);
 
 export { certificadoRoutes };
