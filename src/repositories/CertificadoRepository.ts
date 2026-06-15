@@ -3,28 +3,43 @@ import { Prisma } from '@prisma/client';
 
 export class CertificadoRepository {
   
-  // MÉTODO DE CRIAÇÃO DE CERTIFICADO
-  async create(dados: any, alunoId: number, urlDaImagem: string) {
-    return await prisma.certificado.create({
-      data: {
-        tituloAtividade: dados.tituloAtividade,
-        cargaHorariaInformada: Number(dados.cargaHorariaInformada),
-        dataAtividade: new Date(dados.dataAtividade), // Converte a data do HTML para o formato do banco
-        alunoId: alunoId,
-        areaId: Number(dados.areaId),
-  
-        arquivoImagem: urlDaImagem, 
+  // src/repositories/CertificadoRepository.ts
 
-        // cria o certificado atrelando a validação inicial como PENDENTE e horas validadas zeradas
-        validacao: {
-          create: {
-            status: 'PENDENTE',
-            horasValidadas: 0
-          }
+// MÉTODO DE CRIAÇÃO DE CERTIFICADO ATUALIZADO
+async create(dados: any, alunoId: number, urlDaImagem: string) {
+  return await prisma.certificado.create({
+    data: {
+      tituloAtividade: dados.tituloAtividade,
+      cargaHorariaInformada: Number(dados.cargaHorariaInformada),
+      dataAtividade: new Date(dados.dataAtividade),
+      arquivoImagem: urlDaImagem,
+
+      // 1. Jeito correto de relacionar o Aluno e a Área no Prisma (Evita o erro "Argument aluno is missing")
+      aluno: { 
+        connect: { id: Number(alunoId) } 
+      },
+      area: { 
+        connect: { id: Number(dados.areaId) } 
+      },
+
+      // 2. ADICIONADO: Enviando os novos campos obrigatórios que vieram do formulário!
+      curso: { 
+        connect: { id: Number(dados.cursoId) } 
+      },
+      subcategoria: { 
+        connect: { id: Number(dados.subcategoriaId) } 
+      },
+
+      // Sua validação aninhada (que causava o conflito com os IDs puros)
+      validacao: {
+        create: {
+          status: "PENDENTE",
+          horasValidadas: 0
         }
       }
-    });
-  }
+    }
+  });
+}
   
   // NOVO MÉTODO PARA O DASHBOARD DO ALUNO
   async findByAlunoId(alunoId: number) {
