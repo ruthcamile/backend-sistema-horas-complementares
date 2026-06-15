@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Teste de Upload - Certificado</title>
+    <title>Teste de Upload - Certificado Atualizado</title>
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; max-width: 500px; margin: auto; }
         div { margin-bottom: 15px; }
@@ -14,11 +14,11 @@
     </style>
 </head>
 <body>
-    <h2>🚀 Enviar Certificado</h2>
+    <h2>🚀 Enviar Certificado (Local Test)</h2>
     <form id="formCertificado">
         <div>
             <label>1. Seu Token JWT:</label>
-            <input type="text" id="token" placeholder="eyJhbGciOiJIUzI1NiIs..." required>
+            <input type="text" id="token" placeholder="Cole o Token JWT gerado no login..." required>
         </div>
         <div>
             <label>2. Título da Atividade:</label>
@@ -36,11 +36,21 @@
             <label>5. ID da Área:</label>
             <input type="number" id="areaId" value="1" required>
         </div>
+        
         <div>
-            <label>6. Imagem do Certificado:</label>
+            <label>6. ID da Subcategoria:</label>
+            <input type="number" id="subcategoriaId" value="1" required>
+        </div>
+        <div>
+            <label>7. ID do Curso:</label>
+            <input type="number" id="cursoId" value="1" required>
+        </div>
+
+        <div>
+            <label>8. Imagem/PDF do Certificado:</label>
             <input type="file" id="arquivo" required>
         </div>
-        <button type="submit">Enviar para o Servidor</button>
+        <button type="submit">Enviar para o Servidor Local</button>
     </form>
 
     <h3>Resposta do Servidor:</h3>
@@ -48,26 +58,30 @@
 
     <script>
         document.getElementById('formCertificado').addEventListener('submit', async (e) => {
-            e.preventDefault(); // Evita recarregar a página
+            e.preventDefault();
             
-            const token = document.getElementById('token').value.trim(); // Pega o token
+            const token = document.getElementById('token').value.trim();
             
-            // O FormData faz exatamente a mesma coisa que o Thunder Client deveria fazer!
             const formData = new FormData();
             formData.append('tituloAtividade', document.getElementById('tituloAtividade').value);
             formData.append('cargaHorariaInformada', document.getElementById('cargaHorariaInformada').value);
             formData.append('dataAtividade', document.getElementById('dataAtividade').value);
             formData.append('areaId', document.getElementById('areaId').value);
-            formData.append('arquivo', document.getElementById('arquivo').files[0]); // Pega o arquivo físico
+            
+            // Enviando as novas chaves obrigatórias para o backend
+            formData.append('subcategoriaId', document.getElementById('subcategoriaId').value);
+            formData.append('cursoId', document.getElementById('cursoId').value);
+            
+            formData.append('arquivo', document.getElementById('arquivo').files[0]);
 
-            document.getElementById('resposta').innerText = "Enviando... ⏳";
+            document.getElementById('resposta').innerText = "Enviando para o localhost... ⏳";
 
             try {
-                const response = await fetch('https://backend-sistema-horas-complementares.onrender.com/api/certificados/enviar', {
+                // APONTANDO PARA O SEU LOCALHOST (Mude a porta 3000 se o seu rodar em outra)
+                const response = await fetch('http://localhost:3000/api/certificados/enviar', {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${token}` 
-                        // Note que NÃO colocamos Content-Type aqui. O navegador faz isso sozinho e sem bugar!
+                        'Authorization': `Bearer ${token}`
                     },
                     body: formData
                 });
