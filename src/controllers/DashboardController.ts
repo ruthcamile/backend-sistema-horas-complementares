@@ -12,19 +12,29 @@ export const getDashboardAluno = async (req: Request, res: Response): Promise<an
     const usuarioDoToken = (req as any).user;
     const alunoId = usuarioDoToken.id || usuarioDoToken.userId; 
 
+    // NOVO: Pega o cursoId da URL se existir
+    const { cursoId } = req.query;
+
     if (!alunoId) {
        return res.status(400).json({ erro: "O ID do aluno não veio dentro do token." });
     }
 
-    // 1. Busca todos os certificados APROVADOS do aluno e traz a Área e a Validação junto
+    // NOVO: Monta a cláusula where dinamicamente
+    const whereClause: any = {
+      alunoId: Number(alunoId),
+      validacao: { status: 'APROVADO' }
+    };
+
+    if (cursoId) {
+      whereClause.cursoId = Number(cursoId);
+    }
+
+    // 1. Busca os certificados usando o whereClause dinâmico
     const certificadosAprovados = await prisma.certificado.findMany({
-      where: {
-        alunoId: Number(alunoId),
-        validacao: { status: 'APROVADO' }
-      },
+      where: whereClause,
       include: {
-        area: true,       // nome da área (Ensino, Pesquisa...)
-        validacao: true   // horas que o coordenador validou
+        area: true,       
+        validacao: true   
       }
     });
 
