@@ -29,6 +29,7 @@ model User {
   
   // Relacionamento: Um aluno pode ter vários certificados
   certificados Certificado[]
+  cursos       UsuariosCursos[] // ALTERADO: Aponta para a tabela intermediária explícita
 }
 
 model AreaAtividade {
@@ -36,6 +37,43 @@ model AreaAtividade {
   nome            String
   limiteHorasArea Float
 
+  certificados    Certificado[]
+  subcategorias   Subcategoria[]
+}
+
+// Adicionando o modelo de Curso
+model Curso {
+  id           Int           @id @default(autoincrement())
+  nome         String
+  
+  // Aponta para a tabela intermediária explícita
+  alunos       UsuariosCursos[]      
+  
+  // Relacionamento 1:N com Certificado
+  certificados Certificado[] 
+}
+
+// Novo modelo (Tabela Pivô Explícita)
+model UsuariosCursos {
+  usuarioId Int
+  cursoId   Int
+
+  // Relações
+  usuario   User  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  curso     Curso @relation(fields: [cursoId], references: [id], onDelete: Cascade)
+
+  // CHAVE PRIMÁRIA COMPOSTA COMPATÍVEL COM AIVEN / MYSQL
+  @@id([usuarioId, cursoId])
+}
+
+// Adicionando o modelo de Subcategoria
+model Subcategoria {
+  id              Int           @id @default(autoincrement())
+  nome            String
+  
+  areaId          Int
+  area            AreaAtividade @relation(fields: [areaId], references: [id])
+  
   certificados    Certificado[]
 }
 
@@ -54,6 +92,13 @@ model Certificado {
   // Relacionamento com a Área de Atividade
   areaId  Int
   area    AreaAtividade @relation(fields: [areaId], references: [id])
+
+  // Relacionamentos obrigatórios das novas tabelas
+  cursoId        Int
+  curso          Curso         @relation(fields: [cursoId], references: [id])
+  
+  subcategoriaId Int
+  subcategoria   Subcategoria  @relation(fields: [subcategoriaId], references: [id])
 
   // Relacionamento 1:1 com a Validação
   validacao Validacao?
