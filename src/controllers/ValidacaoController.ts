@@ -17,7 +17,7 @@ export const listarFilaValidacao = async (req: Request, res: Response): Promise<
         validacao: { status: 'PENDENTE' }
       },
       include: {
-        // Trazendo apenas o que importa do aluno por segurança (não precisa trazer a senha/token dele!)
+        // Trazendo apenas o que importa do aluno por segurança
         aluno: { 
           select: { id: true, nome: true, email: true } 
         },
@@ -60,7 +60,7 @@ export const avaliarCertificado = async (req: Request, res: Response): Promise<a
       where: { id: Number(idValidacao) },
       data: {
         status,
-        horasValidadas: status === 'APROVADO' ? Number(horasValidadas || 0) : 0, // vai garantir que o Number nunca tente converter algo nulo
+        horasValidadas: status === 'APROVADO' ? Number(horasValidadas || 0) : 0, // garante que o Number nunca tente converter algo nulo
         observacao: observacao || null,
         dataValidacao: new Date()
       }
@@ -82,18 +82,25 @@ export const buscarCertificadosPorMatricula = async (req: Request, res: Response
   try {
     const { matricula } = req.params;
 
-    // Buscamos o aluno pela matrícula e já trazemos os certificados e as áreas de atividade relacionadas a ele
-    const aluno = await prisma.user.findUnique({
+    // ✨ CORREÇÃO: Alterado para findFirst e ajustado o fechamento dos blocos de chaves do Prisma
+    const aluno = await prisma.user.findFirst({
       where: {
-        matricula: String(matricula)
+        cursos: {
+          some: {
+            matricula: String(matricula)
+          }
+        }
       },
       select: {
         id: true,
         nome: true,
-        email: true,
-        matricula: true,
+        cursos: {
+          select: {
+            matricula: true
+          }
+        },
         departamento: true,
-        // Incluímos os certificados e os detalhes de cada um
+        // Incluímos os certificados e os detalhes de cada um deles
         certificados: {
           include: {
             area: { select: { nome: true } },
