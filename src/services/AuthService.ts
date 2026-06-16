@@ -9,26 +9,46 @@ const SECRET = process.env.JWT_SECRET;
 
 export class AuthService {
   async cadastrar(dados: any) {
-    const { nome, email, senha, role, matricula, departamento } = dados;
+    // 1. Agora extraímos também o 'cursoId' enviado pelo frontend
+    const { nome, email, senha, role, matricula, departamento, cursoId } = dados;
 
-    // 1. Verifica se o e-mail já existe
+    // Verifica se o e-mail já existe
     const usuarioExiste = await userRepository.findByEmail(email);
     if (usuarioExiste) {
       throw new Error('Este e-mail já está em uso.');
     }
 
-    // 2. Criptografa a senha (10 rounds de salt)
-    const senhaHash = await bcrypt.hash(senha, 10); // 10 é o número de interações de hash(rounds de salt), o que é considerado seguro para a maioria dos casos
+    // Criptografa a senha
+    const senhaHash = await bcrypt.hash(senha, 10);
 
-    // 3. Salva no banco
-    const novoUsuario = await userRepository.create({
+    // 2. Montamos os dados base comuns a qualquer usuário
+    const dadosCriacao: any = {
       nome,
       email,
       senha: senhaHash,
-      role: role as Role,
-      matricula: role === 'ALUNO' ? matricula : null,
-      departamento: role === 'COORDENADOR' ? departamento : null,
-    });
+      role: (role as Role) || Role.ALUNO, // Define ALUNO como padrão caso não venha no payload
+    };
+
+    // 3. Separamos a regra de negócio por perfil antes de mandar para o Repository
+    if (dadosCriacao.role === Role.COORDENADOR) {
+      dadosCriacao.departamento = departamento;
+    } else {
+      // Se for ALUNO, criamos o registro aninhado na tabela intermediária UsuariosCursos
+      if (!cursoId) {
+        throw new Error('É necessário informar um curso para cadastrar um aluno.');
+      }
+      
+      dadosCriacao.departamento = null;
+      dadosCriacao.cursos = {
+        create: {
+          cursoId: Number(cursoId),
+          matricula: matricula, // Salvando a matrícula obrigatória aqui!
+        },
+      };
+    }
+
+    // 4. Salva no banco passando o objeto estruturado
+    const novoUsuario = await userRepository.create(dadosCriacao);
 
     return novoUsuario;
   }
@@ -49,7 +69,7 @@ export class AuthService {
     // 3. Gera o Token JWT
     const token = jwt.sign(
       { id: usuario.id, role: usuario.role }, 
-      SECRET, 
+      SECRET!, 
       { expiresIn: '8h' } // Token expira em 8 horas
     );
 

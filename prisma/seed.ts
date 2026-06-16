@@ -41,6 +41,7 @@ async function main() {
       data: {
         usuarioId: aluno.id,
         cursoId: curso.id,
+        matricula: "20260001", // Número de matrícula fictício para teste
       },
     });
     console.log(`🔗 Aluno ${aluno.nome} vinculado ao curso de ${curso.nome}!`);

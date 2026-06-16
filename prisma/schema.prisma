@@ -24,7 +24,6 @@ model User {
   email        String  @unique
   senha        String
   role         Role    @default(ALUNO)
-  matricula    String? @unique
   departamento String?
   
   // Relacionamento: Um aluno pode ter vários certificados
@@ -57,6 +56,9 @@ model Curso {
 model UsuariosCursos {
   usuarioId Int
   cursoId   Int
+
+// A matrícula é obrigatória e única para cada registro.
+matricula String @unique
 
   // Relações
   usuario   User  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)

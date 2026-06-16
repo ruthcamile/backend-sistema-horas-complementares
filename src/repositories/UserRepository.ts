@@ -10,9 +10,7 @@ export class UserRepository {
     });
   }
 
-  async create(data: Prisma.UserCreateInput) {
-    return prisma.user.create({
-      data,
-    });
+  async create(data: any) {
+    return await prisma.user.create({ data });
   }
 }
