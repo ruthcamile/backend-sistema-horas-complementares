@@ -13,6 +13,8 @@ const app = express();
 // Middlewares obrigatórios
 app.use(cors());
 app.use(express.json());
+app.use('/api/validacao', validacaoRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // =================================================================
 // VÍNCULO DAS ROTAS COM OS PREFIXOS EXIGIDOS PELO FRONTEND
