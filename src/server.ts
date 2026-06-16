@@ -13,8 +13,6 @@ const app = express();
 // Middlewares obrigatórios
 app.use(cors());
 app.use(express.json());
-app.use('/api/validacao', validacaoRoutes);
-app.use('/api/dashboard', dashboardRoutes);
 // =================================================================
 // VÍNCULO DAS ROTAS COM OS PREFIXOS EXIGIDOS PELO FRONTEND
 // =================================================================
@@ -24,11 +22,11 @@ app.use('/api/auth', authRoutes);
 
 // 2. Rotas de Certificados do Aluno -> ex: /api/certificados/meus
 app.use('/api/certificados', certificadoRoutes);
-
-// 3. Rotas de Validação (Onde estava dando 404) -> resolve para /api/validacao/validar
+ 
+// 3. resolve para /api/validacao/validar e /api/validacao/listar-pendentes
 app.use('/api/validacao', validacaoRoutes);
 
-// 4. Rotas de Dashboard (Onde estava dando 404) -> resolve para /api/dashboard/coordenador
+// 4. resolve para /api/dashboard/coordenador 
 app.use('/api/dashboard', dashboardRoutes);
 
 // Rota de teste para checar se o backend está online no Render
