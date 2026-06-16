@@ -147,10 +147,13 @@ backend-sistema-horas-complementares/
 |---|---|---|---|
 | `POST` | `/api/auth/register` | Cadastro de novo usuário | ❌ |
 | `POST` | `/api/auth/login` | Login e geração do token JWT | ❌ |
-| `POST` | `/api/certificados` | Upload e registro de certificado | ✅ Aluno |
-| `GET` | `/api/certificados` | Lista certificados (por perfil) | ✅ Ambos |
+| `POST` | `/api/certificados/enviar` | Upload e registro de certificado | ✅ Aluno |
+| `GET` | `/api/certificados` | Lista certificados do aluno logado | ✅ Aluno |
+| `GET` | `/api/certificados/:id` | Detalhes de um certificado específico | ✅ Ambos |
+| `GET` | `/api/certificados/areas` | Árvore de áreas e subcategorias para o formulário | ✅ Aluno |
+| `GET` | `/api/certificados/cursos-do-aluno` | Cursos em que o aluno está matriculado | ✅ Aluno |
 | `PATCH` | `/api/certificados/:id/validar` | Aprovar ou rejeitar certificado | ✅ Coordenador |
-| `GET` | `/api/dashboard` | Métricas de horas e envios | ✅ Ambos |
+| `GET` | `/api/dashboard` | Métricas de horas e envios (suporta filtro por curso) | ✅ Ambos |
 
 > Recomendamos o uso do [Postman](https://www.postman.com/) ou [Thunder Client](https://www.thunderclient.com/) para testar as rotas.
 
@@ -218,14 +221,37 @@ O servidor estará disponível em `http://localhost:3000` 🟢
 O banco de dados foi modelado a partir de um diagrama ER e implementado com Prisma ORM. As principais entidades são:
 
 ```
-Usuario ──── Aluno ──────── Certificado ──── Validacao
-         └── Coordenador ─── Curso ─────────── Area_Atividade
-                          └── Regra
+Usuario ──── Aluno ────────── [ UsuariosCursos ] ────────── Curso ── Regra
+         │                         (Matrícula)               │
+         │                                                   │
+         └── Coordenador                                     │
+                                                             ▼
+                                                        Certificado ──── Validacao
+                                                             │
+                                                             ├── [cursoId]
+                                                             ├── [areaId] ─────── Area_Atividade
+                                                             │                        │
+                                                             └── [subcategoriaId] ────┘
 ```
 
 - **Usuario** — entidade base com herança para Aluno e Coordenador
-- **Certificado** — documento enviado pelo aluno para análise
-- **Validacao** — resultado da análise (Pendente / Aprovado / Reprovado)
+
+- **Aluno** — estudante que envia os certificados para acumular horas
+
+- **Coordenador** — responsável por avaliar e validar os certificados enviados
+
+- **UsuariosCursos** — matrícula que vincula o Aluno ao seu Curso (relação muitos para muitos)
+
+- **Curso** — a graduação ou curso do estudante (ex: ADS)
+
+- **Certificado** — documento enviado pelo aluno (obrigatoriamente ligado a um curso, área e subcategoria)
+
+- **Validacao** — resultado da análise do certificado (Pendente / Aprovado / Reprovado)
+
+- **Area_Atividade** — grandes blocos de atividades da faculdade (Ensino, Pesquisa e Extensão)
+
+- **Subcategoria** — tipo exato da atividade dentro de uma área (ex: Monitoria, Palestra, Curso)
+
 - **Regra** — limites de horas por área e tipo de atividade por curso
 
 ---
@@ -247,7 +273,6 @@ Projeto desenvolvido por estudantes do **3° Período de Análise e Desenvolvime
 | Nome | LinkedIn | GitHub |
 |---|---|---|
 | Ruth Camile | [LinkedIn](https://www.linkedin.com/in/ruth-camile-7b6210295/) | [GitHub](https://github.com/ruthcamile) |
-| Morgana Barbosa | [LinkedIn](https://www.linkedin.com/in/morganabarbosa1212/) | [GitHub](https://github.com/Morganabarbs) |
 | Luis Augusto | [LinkedIn](https://www.linkedin.com/in/luis-augusto-61980235a/) | [GitHub](https://github.com/LuisWebCoding) |
 | Igor Alves | [LinkedIn](https://www.linkedin.com/in/igor-alves15) | [GitHub](https://github.com/igor-araujo-15) |
 
