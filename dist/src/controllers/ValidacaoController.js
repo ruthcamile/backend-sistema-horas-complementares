@@ -1,0 +1,116 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.buscarCertificadosPorMatricula = exports.avaliarCertificado = exports.listarFilaValidacao = void 0;
+const client_1 = require("@prisma/client");
+const prisma = new client_1.PrismaClient();
+// 1. Rota para CARREGAR a tela (GET)
+const listarFilaValidacao = async (req, res) => {
+    try {
+        // Pegando as contagens para os 3 cards do topo
+        const pendentes = await prisma.validacao.count({ where: { status: 'PENDENTE' } });
+        const aprovados = await prisma.validacao.count({ where: { status: 'APROVADO' } });
+        const recusados = await prisma.validacao.count({ where: { status: 'RECUSADO' } });
+        // Pegando a lista de certificados pendentes com os dados do Aluno e da Área
+        const certificadosPendentes = await prisma.certificado.findMany({
+            where: {
+                validacao: { status: 'PENDENTE' }
+            },
+            include: {
+                // Trazendo apenas o que importa do aluno por segurança
+                aluno: {
+                    select: { id: true, nome: true, email: true }
+                },
+                area: {
+                    select: { nome: true }
+                },
+                validacao: true
+            },
+            // Ordena pela data de criação: os mais antigos aparecem primeiro na fila do coordenador!
+            orderBy: {
+                dataEnvio: 'asc'
+            }
+        });
+        // Devolve os dados para o frontend
+        return res.json({
+            cards: { pendentes, aprovados, recusados },
+            lista: certificadosPendentes
+        });
+    }
+    catch (error) {
+        console.error("Erro ao carregar fila de validação:", error);
+        return res.status(500).json({ erro: "Erro ao carregar a fila de certificados." });
+    }
+};
+exports.listarFilaValidacao = listarFilaValidacao;
+// 2. Rota para EXECUTAR a validação (POST/PATCH)
+const avaliarCertificado = async (req, res) => {
+    try {
+        const { idValidacao } = req.params;
+        const { status, horasValidadas, observacao } = req.body;
+        // O status tem que ser APROVADO ou RECUSADO
+        if (status !== 'APROVADO' && status !== 'RECUSADO') {
+            return res.status(400).json({ erro: "Status inválido. Use APROVADO ou RECUSADO." });
+        }
+        // Atualiza a tabela de validação
+        const validacaoAtualizada = await prisma.validacao.update({
+            where: { id: Number(idValidacao) },
+            data: {
+                status,
+                horasValidadas: status === 'APROVADO' ? Number(horasValidadas || 0) : 0, // garante que o Number nunca tente converter algo nulo
+                observacao: observacao || null,
+                dataValidacao: new Date()
+            }
+        });
+        return res.json({
+            mensagem: `Certificado ${status.toLowerCase()} com sucesso!`,
+            validacao: validacaoAtualizada
+        });
+    }
+    catch (error) {
+        console.error("Erro ao avaliar certificado:", error);
+        return res.status(500).json({ erro: "Erro ao registrar a avaliação." });
+    }
+};
+exports.avaliarCertificado = avaliarCertificado;
+// 3. Rota para o coordenador buscar os certificados de um aluno específico pela matrícula (GET)
+const buscarCertificadosPorMatricula = async (req, res) => {
+    try {
+        const { matricula } = req.params;
+        // ✨ CORREÇÃO: Alterado para findFirst e ajustado o fechamento dos blocos de chaves do Prisma
+        const aluno = await prisma.user.findFirst({
+            where: {
+                cursos: {
+                    some: {
+                        matricula: String(matricula)
+                    }
+                }
+            },
+            select: {
+                id: true,
+                nome: true,
+                cursos: {
+                    select: {
+                        matricula: true
+                    }
+                },
+                departamento: true,
+                // Incluímos os certificados e os detalhes de cada um deles
+                certificados: {
+                    include: {
+                        area: { select: { nome: true } },
+                        validacao: true
+                    }
+                }
+            }
+        });
+        if (!aluno) {
+            return res.status(404).json({ erro: "Aluno não encontrado com esta matrícula." });
+        }
+        return res.json(aluno);
+    }
+    catch (error) {
+        console.error("Erro ao buscar por matrícula:", error);
+        return res.status(500).json({ erro: "Erro interno ao realizar a busca." });
+    }
+};
+exports.buscarCertificadosPorMatricula = buscarCertificadosPorMatricula;
