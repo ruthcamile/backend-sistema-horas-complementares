@@ -54,6 +54,14 @@ export class CertificadoController {
   async enviar(req: Request, res: Response): Promise<any> {
     try {
       const alunoId = (req as any).user.id; 
+
+      // Validação básica para garantir que o arquivo foi enviado
+    if (!req.file) {
+      return res.status(400).json({ 
+        erro: "O arquivo do comprovante é obrigatório para o envio do certificado." 
+      });
+    }
+      
       const urlDaImagem = (req.file as any).location || (req.file as any).path; 
 
       // req.body agora deve trazer cursoId e subcategoriaId do frontend
