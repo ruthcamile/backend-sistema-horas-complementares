@@ -9,7 +9,7 @@
 <img src="https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" />
 <img src="https://img.shields.io/badge/Aiven-FF3621?style=for-the-badge&logo=aiven&logoColor=white" />
 
-# SGH — Sistema de Gestão de Horas Complementares
+# AcadPortal — Sistema de Gestão de Horas Complementares
 
 **API REST para controle e validação de horas extracurriculares acadêmicas.**  
 Projeto Integrador · 3° Período · Análise e Desenvolvimento de Sistemas
@@ -20,7 +20,7 @@ Projeto Integrador · 3° Período · Análise e Desenvolvimento de Sistemas
 
 ## Sobre o Projeto
 
-O **SGH (Sistema de Gestão de Horas Complementares)** é uma solução desenvolvida para **digitalizar e automatizar** o processo de envio, análise e validação de certificados extracurriculares em instituições de ensino superior.
+O **AcadPortal (Sistema de Gestão de Horas Complementares)** é uma solução desenvolvida para **digitalizar e automatizar** o processo de envio, análise e validação de certificados extracurriculares em instituições de ensino superior.
 
 Antes do sistema, o controle de horas complementares era feito de forma manual — alunos entregavam documentos físicos, coordenadores analisavam em planilhas e o histórico era difícil de rastrear. O SGH resolve esses problemas com uma plataforma centralizada no formato **PWA (Progressive Web App)**, que funciona como um aplicativo nativo em qualquer dispositivo.
 
