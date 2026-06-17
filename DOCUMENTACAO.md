@@ -1,27 +1,29 @@
-# 📖 Documentação da API — SGH
+<div align="center">
+  
+# Documentação da API — AcadPortal
+
+</div>
 
 <div align="center">
 
 **Sistema de Gestão de Horas Complementares**
 
 <img src="https://img.shields.io/badge/REST-API-blue?style=for-the-badge" />
-<img src="https://img.shields.io/badge/JSON-Responses-yellow?style=for-the-badge&logo=json&logoColor=white" />
-<img src="https://img.shields.io/badge/JWT-Auth-orange?style=for-the-badge&logo=jsonwebtokens&logoColor=white" />
 <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" />
 
 </div>
 
 ---
 
-## 📋 Visão Geral
+## Visão Geral
 
-Esta documentação descreve todos os contratos de integração (**Endpoints**) da API do **SGH — Sistema de Gestão de Horas Complementares**.
+Esta documentação descreve todos os contratos de integração (**Endpoints**) da API do **AcadPortal — Sistema de Gestão de Horas Complementares**.
 
 A API foi construída de forma agnóstica, retornando respostas padronizadas em **JSON**, pronta para consumo por aplicações **PWA, Mobile e Web**.
 
 ### Base URL
 ```
-https://seu-projeto.onrender.com
+https://backend-sistema-horas-complementares.onrender.com
 ```
 
 ### Formato padrão de resposta
@@ -35,7 +37,7 @@ https://seu-projeto.onrender.com
 
 ---
 
-## 🔐 Autenticação
+## Autenticação
 
 A maioria das rotas requer autenticação via **JWT Token**.
 
@@ -68,7 +70,7 @@ Authorization: Bearer <seu_token_aqui>
 
 ---
 
-## 🛡️ 1. Autenticação
+## 1. Autenticação
 
 ### 1.1 Cadastro de Usuário
 
@@ -141,7 +143,7 @@ POST /api/auth/login
 
 ---
 
-## 🎓 2. Área do Aluno
+## 2. Área do Aluno
 
 ### 2.1 Buscar Cursos do Aluno
 
@@ -316,7 +318,7 @@ GET /api/dashboard/aluno?cursoId=1
 
 ---
 
-## 🏢 3. Área do Coordenador
+## 3. Área do Coordenador
 
 > ⚠️ Todas as rotas desta seção exigem perfil **COORDENADOR**.
 
@@ -478,7 +480,7 @@ GET /api/dashboard/coordenador
 
 ---
 
-## 🧪 Testando a API
+## Testando a API
 
 Recomendamos as seguintes ferramentas para testar os endpoints:
 
@@ -488,7 +490,7 @@ Recomendamos as seguintes ferramentas para testar os endpoints:
 
 ### Exemplo de requisição com token (cURL)
 ```bash
-curl -X GET https://seu-projeto.onrender.com/api/certificados/meus \
+curl -X GET https://backend-sistema-horas-complementares.onrender.com/api/certificados/meus \
   -H "Authorization: Bearer <seu_token_aqui>" \
   -H "Content-Type: application/json"
 ```
@@ -501,16 +503,16 @@ A API pode ser consumida por qualquer cliente HTTP:
 
 | Plataforma | Compatível |
 |---|---|
-| 🌐 Web (PWA) | ✅ |
-| 📱 Mobile (React Native) | ✅ |
-| 🖥️ Desktop | ✅ |
-| 🔗 Integrações externas | ✅ |
+| Web (PWA) |
+| Mobile (React Native) |
+| Desktop |
+| Integrações externas |
 
 ---
 
 <div align="center">
 
-**SGH — Sistema de Gestão de Horas Complementares**  
+**AcadPortal — Sistema de Gestão de Horas Complementares**  
 Projeto Integrador · 3° Período · Análise e Desenvolvimento de Sistemas
 
 </div>
